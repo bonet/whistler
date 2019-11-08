@@ -1,0 +1,89 @@
+Objects:
+- User: owner of points and rewards (through RewardManager)
+- RewardManager: User's wallet that manage points and rewards
+- Transaction: paid proof of purchase. Its amount determines how many Point quantity a user will get
+- Point: a single Point object issued per transaction (it)
+- Reward: X amount of Points / etc can be converted to a Reward
+
+
+Flow:
+- To issue a point to user, client can call RewardManager#issue_point(transaction)
+- To issue a reward to user, client can call RewardManager#issue_reward
+
+
+Assumption:
+- Point is unique per each transaciton. Cannot combine 2 or more transactions to create a Point object
+- Reward conversion rule can be based by Point or other aspects. It's not strictly related to Points
+- Transactions less than $100 woould not generate a Point object
+- Thus we also need a Transaction object. Some Reward conversion rule are based on Transaction
+
+
+-----
+RewardManagerController
+- index (listing all users)
+- show (listing all points and rewards belong to a User / RewardManager)
+
+-----
+Model: User
+  has_one: RewardManager
+  has_many: Transactions
+
+  attr: - id
+        - name
+        - etc
+        - loyalty_tier (standard / gold / platinum)
+
+
+-----
+Model: Transaction
+  belongs_to: User
+
+  attr: - id
+        - amount
+        - user_id
+
+-----
+Model: RewardManager
+  belongs_to: User
+  has_many: Points
+  has_many: Rewards
+  has_many: RewardConversionRules
+
+  attr: - id
+        - user_id
+
+  method: - issue_points(transaction) # per transaction
+          - issue_rewards # triggered after issuing points
+
+-----
+Model: Point
+  belongs_to: RewardManager
+
+  attr: - id
+        - type (local / international)
+        - reward_manager_id
+        - conversion_dollar #
+        - conversion_quantity #
+        - transaction_id
+        - transaction_amount
+        - quantity
+        - expiry_date
+        - expired (boolean)
+
+-----
+Model: Reward
+  belongs_to: RewardManager
+  has_many: RewardConversionRule
+
+  attr: - id
+        - type (free_coffee / cash_rebate / free_movie_ticket)
+        - reward_manager_id
+        - name
+
+-----
+Model: RewardConversionRule
+  belongs_to: RewardManager
+  belongs_to: Reward
+
+  attr: - reward_id
+        - reward_manager_id
