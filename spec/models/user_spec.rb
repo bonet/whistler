@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  let(:user) { User.create(first_name: 'John', last_name: 'Doe', email: 'jdoe@example.com', loyalty_tier: 'standard') }
-  let(:transaction) { Transaction.create(amount: 10000.09, user: user)}
+  let!(:user) { User.create(first_name: 'John', last_name: 'Doe', email: 'jdoe@example.com') }
+  let!(:transaction) { Transaction.create(amount: 10000.09, user: user)}
 
   context "Attributes" do
 
@@ -13,7 +13,10 @@ RSpec.describe User, type: :model do
   end
 
   context "Associations" do
-    it { should have_many(:transactions) }
+    it "has many transactions" do
+      expect(user.transactions.count).to eq 1
+      expect(user.transactions.first).to eq transaction
+    end
   end
 
 end
