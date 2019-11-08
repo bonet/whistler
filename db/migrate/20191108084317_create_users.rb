@@ -5,6 +5,7 @@ class CreateUsers < ActiveRecord::Migration[5.0]
       t.string :last_name
       t.string :email
       t.integer :loyalty_tier
+      t.timestamps
     end
   end
 end
