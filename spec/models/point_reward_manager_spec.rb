@@ -1,0 +1,1 @@
+point_reward_manager_spec.rb

@@ -1,7 +1,7 @@
 Objects:
 - User: owner of points and rewards (through PointRewardManager)
 - PointRewardManager: User's wallet that manage points and rewards
-- Transaction: paid proof of purchase. Its amount determines how many Point quantity a user will get
+- OrderTransaction: paid proof of purchase. Its amount determines how many Point quantity a user will get (ideally named Transaction, but it conflicts with Rails internal naming. Should have better naming)
 - Point: a single Point object issued per transaction (it)
 - Reward: X amount of Points / etc can be converted to a Reward
 
@@ -16,6 +16,7 @@ Assumption:
 - Reward conversion rule can be based by Point or other aspects. It's not strictly related to Points
 - Transactions less than $100 would not generate a Point object
 - Thus we also need a Transaction object. Some Reward conversion rule are based on Transaction
+- Points expire 1 year after its issuance
 
 
 -----
@@ -26,7 +27,7 @@ PointRewardManagerController
 -----
 Model: User
   has_one: PointRewardManager
-  has_many: Transactions
+  has_many: OrderTransactions
 
   attr: - id
         - name
@@ -35,7 +36,7 @@ Model: User
 
 
 -----
-Model: Transaction
+Model: OrderTransaction
   belongs_to: User
 
   attr: - id
