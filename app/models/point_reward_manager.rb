@@ -28,14 +28,27 @@ class PointRewardManager < ActiveRecord::Base
     total_points = self.points.where(expired: false).sum(:quantity)
 
     if total_points < 1000
-      self.user.loyalty_tier = :standard
+      user.loyalty_tier = :standard
     elsif total_points >=1000 && total_points < 5000
-      self.user.loyalty_tier = :gold
+      user.loyalty_tier = :gold
     elsif total_points >= 5000
-      self.user.loyalty_tier = :platinum
+      user.loyalty_tier = :platinum
     end
 
-    self.user.save
+    user.save
+
+    calculate_reward_after_loyalty_tier_changed
+  end
+
+  def calculate_reward_after_loyalty_tier_changed
+    previous_loyalty_tier = user.previous_changes['loyalty_tier']&.[](0)
+    current_loyalty_tier = user.loyalty_tier
+
+    if previous_loyalty_tier=='standard' && ['gold'].include?(current_loyalty_tier)
+      (1..4).each do
+        self.rewards << Reward.find_by(reward_type: 'airport_lounge_access')
+      end
+    end
   end
 
   def calculate_reward_free_coffee

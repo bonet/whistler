@@ -6,6 +6,7 @@ RSpec.describe PointRewardManager, type: :model do
     @manager = PointRewardManager.create(user: @user)
     @reward = Reward.create(reward_type: 'free_coffee')
     @reward_2 = Reward.create(reward_type: 'cash_rebate')
+    @reward_3 = Reward.create(reward_type: 'airport_lounge_access')
 
     Timecop.freeze(Time.now.last_month) do
       @order = OrderTransaction.create(amount: 10000.09, user: @user)
@@ -14,26 +15,46 @@ RSpec.describe PointRewardManager, type: :model do
       (1..8).each do |i|
         OrderTransaction.create(amount: rand(100..10000), user: @user)
       end
-
-      @manager.issue_point(order_transaction: @order, type: 'local')
-      @manager.issue_point(order_transaction: @order_2, type: 'international')
     end
   end
 
   context "issue point" do
     it "can issue point" do
-      local_point = @manager.points.first
-      international_point = @manager.points.last
-      expect(local_point.quantity).to eq 1000
-      expect(international_point.quantity).to eq 4000
       @user.reload
+
+      Timecop.freeze(Time.now.last_month) do
+        @manager.issue_point(order_transaction: @order, type: 'local')
+      end
+
+      local_point = @manager.points.where(type: 'LocalPoint').first
+      expect(local_point.quantity).to eq 1000
+      expect(@manager.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
+
+      expect(@user.loyalty_tier).to eq 'gold'
+
+      Timecop.freeze(Time.now.last_month) do
+        @manager.issue_point(order_transaction: @order_2, type: 'international')
+      end
+
+      international_point = @manager.points.where(type: 'InternationalPoint').last
+      expect(international_point.quantity).to eq 4000
+      expect(@manager.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
+
       expect(@user.loyalty_tier).to eq 'platinum'
     end
 
     it "can issue reward" do
+      @user.reload
+      Timecop.freeze(Time.now.last_month) do
+        @manager.issue_point(order_transaction: @order, type: 'local')
+      end
+
       @manager.issue_reward
+      @manager.rewards.reload
+
       expect(@manager.rewards.where(reward_type: 'free_coffee').count).to eq 2
       expect(@manager.rewards.where(reward_type: 'cash_rebate').count).to eq 1
+      expect(@manager.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
     end
   end
 end
