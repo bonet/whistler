@@ -1,3 +1,4 @@
 class Reward < ActiveRecord::Base
-  has_and_belongs_to_many :point_reward_managers
+  has_many :user_rewards
+  has_many :users, through: :user_rewards
 end

@@ -1,9 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe PointRewardManager, type: :model do
+RSpec.describe PointRewardManagerService, type: :service do
   before(:all) do
     @user = User.create(first_name: 'John', last_name: 'Doe', email: 'jdoe@example.com', birthday: Date.parse('11-11-1990'))
-    @manager = PointRewardManager.create(user: @user)
+    @manager = PointRewardManagerService.new(user: @user)
+
     @reward = Reward.create(reward_type: 'free_coffee')
     @reward_2 = Reward.create(reward_type: 'cash_rebate')
     @reward_3 = Reward.create(reward_type: 'airport_lounge_access')
@@ -26,20 +27,18 @@ RSpec.describe PointRewardManager, type: :model do
         @manager.issue_point(order_transaction: @order, type: 'local')
       end
 
-      local_point = @manager.points.where(type: 'LocalPoint').first
+      local_point = @user.points.where(type: 'LocalPoint').first
       expect(local_point.quantity).to eq 1000
-      expect(@manager.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
-
+      expect(@user.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
       expect(@user.loyalty_tier).to eq 'gold'
 
       Timecop.freeze(Time.now.last_month) do
         @manager.issue_point(order_transaction: @order_2, type: 'international')
       end
 
-      international_point = @manager.points.where(type: 'InternationalPoint').last
+      international_point = @user.points.where(type: 'InternationalPoint').last
       expect(international_point.quantity).to eq 4000
-      expect(@manager.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
-
+      expect(@user.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
       expect(@user.loyalty_tier).to eq 'platinum'
     end
 
@@ -50,11 +49,11 @@ RSpec.describe PointRewardManager, type: :model do
       end
 
       @manager.issue_reward
-      @manager.rewards.reload
+      @user.rewards.reload
 
-      expect(@manager.rewards.where(reward_type: 'free_coffee').count).to eq 2
-      expect(@manager.rewards.where(reward_type: 'cash_rebate').count).to eq 1
-      expect(@manager.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
+      expect(@user.rewards.where(reward_type: 'free_coffee').count).to eq 2
+      expect(@user.rewards.where(reward_type: 'cash_rebate').count).to eq 1
+      expect(@user.rewards.where(reward_type: 'airport_lounge_access').count).to eq 4
     end
   end
 end

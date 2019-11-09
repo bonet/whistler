@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20191109000042) do
+ActiveRecord::Schema.define(version: 20191109071200) do
 
   create_table "order_transactions", force: :cascade do |t|
     t.decimal  "amount",     precision: 8, scale: 2
@@ -20,36 +20,33 @@ ActiveRecord::Schema.define(version: 20191109000042) do
     t.index ["user_id"], name: "index_order_transactions_on_user_id"
   end
 
-  create_table "point_reward_managers", force: :cascade do |t|
-    t.integer "user_id"
-    t.index ["user_id"], name: "index_point_reward_managers_on_user_id"
-  end
-
-  create_table "point_reward_managers_rewards", force: :cascade do |t|
-    t.integer "reward_id"
-    t.integer "point_reward_manager_id"
-    t.index ["point_reward_manager_id"], name: "idx_managers_point_reward_managers"
-    t.index ["reward_id"], name: "idx_managers_rewards"
-  end
-
   create_table "points", force: :cascade do |t|
     t.string   "type"
     t.integer  "order_transaction_id"
-    t.integer  "quantity",                default: 0
-    t.integer  "quantity_used",           default: 0
-    t.boolean  "expired",                 default: false
+    t.integer  "user_id"
+    t.integer  "quantity",             default: 0
+    t.integer  "quantity_used",        default: 0
+    t.boolean  "expired",              default: false
     t.datetime "expire_at"
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.integer  "point_reward_manager_id"
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
     t.index ["order_transaction_id"], name: "index_points_on_order_transaction_id"
-    t.index ["point_reward_manager_id"], name: "index_points_on_point_reward_manager_id"
     t.index ["type"], name: "index_points_on_type"
+    t.index ["user_id"], name: "index_points_on_user_id"
   end
 
   create_table "rewards", force: :cascade do |t|
     t.string "reward_type", null: false
     t.string "name"
+  end
+
+  create_table "user_rewards", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "reward_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reward_id"], name: "index_user_rewards_on_reward_id"
+    t.index ["user_id"], name: "index_user_rewards_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|

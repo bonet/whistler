@@ -1,8 +1,8 @@
 class Point < ActiveRecord::Base
   belongs_to :order_transaction
-  belongs_to :point_reward_manager
+  belongs_to :user
 
-  validates :order_transaction, :point_reward_manager, presence: true
+  validates :order_transaction, :user, presence: true
 
   before_create :set_expire_at
   before_create :set_quantity
@@ -14,5 +14,10 @@ class Point < ActiveRecord::Base
   def set_quantity
     point_units = (self.order_transaction.amount / self.class::CONVERSION_DOLLAR).floor
     self.quantity = point_units * self.class::CONVERSION_POINT
+  end
+
+  def expire!
+    self.expired=true
+    self.save
   end
 end
