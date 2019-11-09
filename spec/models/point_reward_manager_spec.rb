@@ -1,6 +1,4 @@
 require 'rails_helper'
-require "rake"
-Rails.application.load_tasks
 
 RSpec.describe PointRewardManager, type: :model do
   before(:all) do

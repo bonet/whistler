@@ -6,18 +6,18 @@ RSpec.describe Point, type: :model do
   let!(:manager) { PointRewardManager.create(user: user) }
   let!(:order_transaction) { OrderTransaction.create(amount: 10000.09, user: user)}
   let!(:order_transaction_2) { OrderTransaction.create(amount: 20000.09, user: user)}
-  let!(:local_point) {LocalPoint.create(order_transaction: order_transaction, quantity: 10, point_reward_manager: manager) }
-  let!(:international_point) {InternationalPoint.create(order_transaction: order_transaction_2, quantity: 20, point_reward_manager: manager) }
+  let!(:local_point) {LocalPoint.create(order_transaction: order_transaction, point_reward_manager: manager) }
+  let!(:international_point) {InternationalPoint.create(order_transaction: order_transaction_2, point_reward_manager: manager) }
 
   context "Attributes" do
 
     it "has valid attributes" do
-      expect(local_point.quantity).to eq 10
+      expect(local_point.quantity).to eq 1000
       expect(local_point.expired).to eq false
-      expect(local_point.expire_at).to eq expiry_datetime
-      expect(international_point.quantity).to eq 20
+      expect(expiry_datetime - local_point.expire_at).to be <= 60000
+      expect(international_point.quantity).to eq 4000
       expect(international_point.expired).to eq false
-      expect(international_point.expire_at).to eq expiry_datetime
+      expect(expiry_datetime - international_point.expire_at).to be <= 60000
     end
   end
 

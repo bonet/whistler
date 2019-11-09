@@ -7,8 +7,8 @@ class PointRewardManager < ActiveRecord::Base
 
   def issue_point(order_transaction:, type:)
     return if order_transaction.blank? || !['local', 'international'].include?(type)
-    klass = Object.const_get("#{type.capitalize}Point")
-    self.points.create(order_transaction: order_transaction, type: klass)
+
+    create_point(order_transaction, type)
     update_user_loyalty_tier
   end
 
@@ -18,6 +18,11 @@ class PointRewardManager < ActiveRecord::Base
   end
 
   private
+
+  def create_point(order_transaction, type)
+    klass = Object.const_get("#{type.capitalize}Point")
+    self.points.create(order_transaction: order_transaction, type: klass)
+  end
 
   def update_user_loyalty_tier
     total_points = self.points.where(expired: false).sum(:quantity)
