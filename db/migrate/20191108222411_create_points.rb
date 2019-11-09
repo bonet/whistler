@@ -4,8 +4,11 @@ class CreatePoints < ActiveRecord::Migration[5.0]
       t.string :type, index: true
       t.references :order_transaction
       t.integer :quantity, default: 0
+      t.integer :quantity_used, default: 0
       t.boolean :expired, default: false
-      t.datetime :expired_at
+      t.datetime :expire_at
+
+      t.timestamps
     end
   end
 end

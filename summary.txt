@@ -61,8 +61,8 @@ Model: Point
   belongs_to: PointRewardManager
 
   attr: - id
-        - type (local / international)
-        - reward_manager_id
+        - type (local / international) --> using STI
+        - point_reward_manager_id
         - conversion_dollar #
         - conversion_quantity #
         - transaction_id
@@ -78,7 +78,7 @@ Model: Reward
 
   attr: - id
         - type (free_coffee / cash_rebate / free_movie_ticket)
-        - reward_manager_id
+        - point_reward_manager_id
         - name
 
 -----
@@ -87,4 +87,4 @@ Model: RewardConversionRule
   belongs_to: Reward
 
   attr: - reward_id
-        - reward_manager_id
+        - point_reward_manager_id

@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
+    @user = User.create(first_name: 'John', last_name: 'Doe', email: 'jdoe@example.com', birthday: Date.parse('11-11-1990'))
   let!(:user) { User.create(first_name: 'John', last_name: 'Doe', email: 'jdoe@example.com') }
   let!(:order_transaction) { OrderTransaction.create(amount: 10000.09, user: user)}
   let!(:manager) {PointRewardManager.create(user: user)}
