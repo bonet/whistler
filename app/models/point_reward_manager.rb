@@ -5,10 +5,11 @@ class PointRewardManager < ActiveRecord::Base
 
   validates :user, presence: true
 
-  def issue_point(order_transaction:, type: 'local')
+  def issue_point(order_transaction:, type:)
     return if order_transaction.blank? || !['local', 'international'].include?(type)
     klass = Object.const_get("#{type.capitalize}Point")
-    point = klass.create(order_transaction: order_transaction, point_reward_manager: self)
+    self.points.create(order_transaction: order_transaction, type: klass)
+    update_user_loyalty_tier
   end
 
   def issue_reward
@@ -17,6 +18,20 @@ class PointRewardManager < ActiveRecord::Base
   end
 
   private
+
+  def update_user_loyalty_tier
+    total_points = self.points.where(expired: false).sum(:quantity)
+
+    if total_points < 1000
+      self.user.loyalty_tier = :standard
+    elsif total_points >=1000 && total_points < 5000
+      self.user.loyalty_tier = :gold
+    elsif total_points >= 5000
+      self.user.loyalty_tier = :platinum
+    end
+
+    self.user.save
+  end
 
   def calculate_reward_free_coffee
     if self.user.birthday.month == Time.now.month

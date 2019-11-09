@@ -22,27 +22,14 @@ RSpec.describe PointRewardManager, type: :model do
     end
   end
 
-  context "Attributes" do
-
-    it "has valid attributes" do
-    end
-  end
-
-  context "Associations" do
-    it "has many-to-many relationship with Reward" do
-    end
-
-    it "has many Point" do
-
-    end
-  end
-
   context "issue point" do
     it "can issue point" do
       local_point = @manager.points.first
       international_point = @manager.points.last
       expect(local_point.quantity).to eq 1000
       expect(international_point.quantity).to eq 4000
+      @user.reload
+      expect(@user.loyalty_tier).to eq 'platinum'
     end
 
     it "can issue reward" do
