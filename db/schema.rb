@@ -27,9 +27,11 @@ ActiveRecord::Schema.define(version: 20191109071200) do
     t.integer  "quantity",             default: 0
     t.integer  "quantity_used",        default: 0
     t.boolean  "expired",              default: false
+    t.string   "label"
     t.datetime "expire_at"
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false
+    t.index ["label"], name: "index_points_on_label"
     t.index ["order_transaction_id"], name: "index_points_on_order_transaction_id"
     t.index ["type"], name: "index_points_on_type"
     t.index ["user_id"], name: "index_points_on_user_id"
