@@ -8,7 +8,6 @@ class PointRewardManagerService
   def issue_point(order_transaction:, type:)
     return if order_transaction.blank? || !['local', 'international'].include?(type)
 
-    calculate_quarterly_bonus_point
     create_point(order_transaction, type)
   end
 
